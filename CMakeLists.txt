@@ -62,3 +62,10 @@ if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
+
+# convenience target for quick build and run
+add_custom_target(run
+  DEPENDS ${PROJECT_NAME}
+  COMMAND ${PROJECT_NAME}
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  VERBATIM)
