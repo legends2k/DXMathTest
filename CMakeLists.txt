@@ -19,33 +19,32 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_options(${PROJECT_NAME} PRIVATE
   $<$<CONFIG:Release,RelWithDebInfo>:-Os>)
 
-file(DOWNLOAD
-  https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
-  ${CMAKE_BINARY_DIR}/_deps/sal-src/sal.h
-  EXPECTED_HASH MD5=08728f6e65b817294b8ecbb9056d3fe8
-  STATUS SAL_DOWNLOAD_STATUS)
-list(GET SAL_DOWNLOAD_STATUS 0 SAL_STATUS_CODE)
-if (NOT SAL_STATUS_CODE EQUAL 0)
-  message(FATAL_ERROR "Failed to download sal.h for DirectX Math library")
-endif ()
-add_library(sal INTERFACE)
-include(GNUInstallDirs)
-target_include_directories(sal INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/sal-src>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-include(CMakePrintHelpers)
-cmake_print_properties(TARGETS sal
-  PROPERTIES INTERFACE_INCLUDE_DIRECTORIES)
-install(TARGETS sal
-  EXPORT salTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES sal.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(EXPORT salTargets
-  FILE salTargets.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
-
 include(FetchContent)
+FetchContent_Declare(
+  sal
+  URL https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
+  URL_HASH MD5=08728f6e65b817294b8ecbb9056d3fe8
+  DOWNLOAD_NO_EXTRACT TRUE
+  DOWNLOAD_NO_PROGRESS TRUE
+)
+FetchContent_GetProperties(sal)
+if (NOT sal_POPULATED)
+  FetchContent_Populate(sal)
+  add_library(sal INTERFACE)
+  include(GNUInstallDirs)
+  target_include_directories(sal INTERFACE
+    $<BUILD_INTERFACE:${sal_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+  install(TARGETS sal
+    EXPORT salTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  install(FILES sal.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  install(EXPORT salTargets
+    FILE salTargets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
+endif ()
+
 FetchContent_Declare(
   DirectXMath
   GIT_REPOSITORY https://github.com/Microsoft/DirectXMath
