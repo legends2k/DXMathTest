@@ -16,8 +16,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD_REQUIRED ON
   CXX_EXTENSIONS OFF)
-target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<CONFIG:Release,RelWithDebInfo>:-Os>)
 
 include(FetchContent)
 FetchContent_Declare(
