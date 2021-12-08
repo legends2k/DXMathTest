@@ -21,34 +21,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 include(FetchContent)
 FetchContent_Declare(
-  sal
-  URL
-    https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
-  URL_HASH             MD5=08728f6e65b817294b8ecbb9056d3fe8
-  DOWNLOAD_NO_EXTRACT  TRUE
-  DOWNLOAD_NO_PROGRESS TRUE
-)
-FetchContent_GetProperties(sal)
-if (NOT sal_POPULATED)
-  FetchContent_Populate(sal)
-  add_library(sal INTERFACE)
-  # Following are needed to make DirectX Math export work
-  # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
-  include(GNUInstallDirs)
-  target_include_directories(sal INTERFACE
-    $<BUILD_INTERFACE:${sal_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-  install(TARGETS sal
-    EXPORT sal-Targets
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-  install(FILES sal.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-  install(EXPORT sal-Targets
-    FILE sal-Targets.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
-endif ()
-
-FetchContent_Declare(
   DirectXMath
   GIT_REPOSITORY https://github.com/Microsoft/DirectXMath
   GIT_TAG        0ca5e0b89ac740eea850760f54211a8609df7265
@@ -58,6 +30,37 @@ FetchContent_MakeAvailable(DirectXMath)
 # disable XMVECTOR operator overloads; unsupported by GCC and Clang
 target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
-target_link_libraries(DirectXMath INTERFACE sal)
+
+if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+  FetchContent_Declare(
+    sal
+    URL
+    https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
+    URL_HASH             MD5=08728f6e65b817294b8ecbb9056d3fe8
+    DOWNLOAD_NO_EXTRACT  TRUE
+    DOWNLOAD_NO_PROGRESS TRUE
+    )
+  FetchContent_GetProperties(sal)
+  if (NOT sal_POPULATED)
+    FetchContent_Populate(sal)
+    add_library(sal INTERFACE)
+    # Following are needed to make DirectX Math export work
+    # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
+    include(GNUInstallDirs)
+    target_include_directories(sal INTERFACE
+      $<BUILD_INTERFACE:${sal_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    install(TARGETS sal
+      EXPORT sal-Targets
+      INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    install(FILES sal.h
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    install(EXPORT sal-Targets
+      FILE sal-Targets.cmake
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
+
+    target_link_libraries(DirectXMath INTERFACE sal)
+  endif ()
+endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
