@@ -30,10 +30,11 @@ target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
 
 if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+  # Use commit ID even though sal.h won’t be updated (CoreRT is an archived project)
   FetchContent_Declare(
     sal
     URL
-    https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
+    https://raw.githubusercontent.com/dotnet/corert/9d8bd29a71f68941aaa2c00e9c9a0eed86cafa10/src/Native/inc/unix/sal.h
     URL_HASH             MD5=08728f6e65b817294b8ecbb9056d3fe8
     DOWNLOAD_NO_EXTRACT  TRUE
     DOWNLOAD_NO_PROGRESS TRUE
