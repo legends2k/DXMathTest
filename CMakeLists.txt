@@ -21,13 +21,29 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 file(DOWNLOAD
   https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
-  "${CMAKE_BINARY_DIR}/_deps/sal-src/sal.h"
+  ${CMAKE_BINARY_DIR}/_deps/sal-src/sal.h
   EXPECTED_HASH MD5=08728f6e65b817294b8ecbb9056d3fe8
   STATUS SAL_DOWNLOAD_STATUS)
 list(GET SAL_DOWNLOAD_STATUS 0 SAL_STATUS_CODE)
 if (NOT SAL_STATUS_CODE EQUAL 0)
   message(FATAL_ERROR "Failed to download sal.h for DirectX Math library")
 endif ()
+add_library(sal INTERFACE)
+include(GNUInstallDirs)
+target_include_directories(sal INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/sal-src>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+include(CMakePrintHelpers)
+cmake_print_properties(TARGETS sal
+  PROPERTIES INTERFACE_INCLUDE_DIRECTORIES)
+install(TARGETS sal
+  EXPORT salTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES sal.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT salTargets
+  FILE salTargets.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -37,11 +53,9 @@ FetchContent_Declare(
   GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(DirectXMath)
-target_include_directories(DirectXMath INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/sal-src>
-  $<INSTALL_INTERFACE:include>)
 # disable XMVECTOR operator overloads; unsupported by GCC and Clang
 target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
+target_link_libraries(DirectXMath INTERFACE sal)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
