@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(tesst VERSION 0.1)
+project(DXMTest VERSION 0.1)
 
 # Set a default build type if none was specified
 set(default_build_type "Debug")
@@ -11,7 +11,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "Release" "RelWithDebInfo")
 endif()
 
-add_executable(${PROJECT_NAME} "test.cpp")
+add_executable(${PROJECT_NAME} main.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD_REQUIRED ON
@@ -22,26 +22,29 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 include(FetchContent)
 FetchContent_Declare(
   sal
-  URL https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
-  URL_HASH MD5=08728f6e65b817294b8ecbb9056d3fe8
-  DOWNLOAD_NO_EXTRACT TRUE
+  URL
+    https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h
+  URL_HASH             MD5=08728f6e65b817294b8ecbb9056d3fe8
+  DOWNLOAD_NO_EXTRACT  TRUE
   DOWNLOAD_NO_PROGRESS TRUE
 )
 FetchContent_GetProperties(sal)
 if (NOT sal_POPULATED)
   FetchContent_Populate(sal)
   add_library(sal INTERFACE)
+  # Following are needed to make DirectX Math export work
+  # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
   include(GNUInstallDirs)
   target_include_directories(sal INTERFACE
     $<BUILD_INTERFACE:${sal_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
   install(TARGETS sal
-    EXPORT salTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    EXPORT sal-Targets
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-  install(FILES sal.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-  install(EXPORT salTargets
-    FILE salTargets.cmake
+  install(FILES sal.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  install(EXPORT sal-Targets
+    FILE sal-Targets.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
 endif ()
 

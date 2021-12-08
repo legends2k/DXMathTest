@@ -1,5 +1,6 @@
 #include <iostream>
 
+// Note: Order matters.  Clang also defines __GNUG__!!
 #if defined(__clang__)
 #  define COMPILER_CLANG
 #elif defined(__GNUG__)
@@ -19,16 +20,10 @@
 using namespace DirectX;
 
 int main() {
-  XMVECTOR vFive = {1.0f, 1.0f};
+  XMVECTOR v = {1.0f, 1.0f};
   XMVECTOR vQuat = XMQuaternionRotationAxis(XMVECTOR{0, 0, 1, 0}, XM_PIDIV2);
   auto mRot = XMMatrixRotationQuaternion(vQuat);
-  std::cout << vFive[0] << '\t'
-            << vFive[1] << '\t'
-            << vFive[2] << '\t'
-            << vFive[3] << '\n';
-  vFive = XMVector4Transform(vFive, mRot);
-  std::cout << vFive[0] << '\t'
-            << vFive[1] << '\t'
-            << vFive[2] << '\t'
-            << vFive[3] << '\n';
+  std::cout << v[0] << '\t' << v[1] << '\t' << v[2] << '\t' << v[3] << '\n';
+  v = XMVector4Transform(v, mRot);
+  std::cout << v[0] << '\t' << v[1] << '\t' << v[2] << '\t' << v[3] << '\n';
 }
