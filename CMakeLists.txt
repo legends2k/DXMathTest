@@ -29,38 +29,18 @@ FetchContent_MakeAvailable(DirectXMath)
 target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
 
-if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-  # Use commit ID even though sal.h won’t be updated (CoreRT is an archived project)
-  FetchContent_Declare(
-    sal
-    URL
-    https://raw.githubusercontent.com/dotnet/corert/9d8bd29a71f68941aaa2c00e9c9a0eed86cafa10/src/Native/inc/unix/sal.h
-    URL_HASH             MD5=08728f6e65b817294b8ecbb9056d3fe8
-    DOWNLOAD_NO_EXTRACT  TRUE
-    DOWNLOAD_NO_PROGRESS TRUE
-    )
-  FetchContent_GetProperties(sal)
-  if (NOT sal_POPULATED)
-    FetchContent_Populate(sal)
-    add_library(sal INTERFACE)
-    # Following are needed to make DirectX Math export work
-    # https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
-    include(GNUInstallDirs)
-    target_include_directories(sal INTERFACE
-      $<BUILD_INTERFACE:${sal_SOURCE_DIR}>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-    install(TARGETS sal
-      EXPORT sal-Targets
-      INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    install(FILES sal.h
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    install(EXPORT sal-Targets
-      FILE sal-Targets.cmake
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sal)
-
-    target_link_libraries(DirectXMath INTERFACE sal)
-  endif ()
-endif ()
+FetchContent_Declare(
+  NoSAL
+  GIT_REPOSITORY https://github.com/legends2k/NoSAL
+  GIT_TAG        04fcde93e7c76e1a456a890a43328529a65297e8
+  GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(NoSAL)
+cmake_policy(PUSH)
+# Allow calling target_link_libraries on targets not authored here
+cmake_policy(SET CMP0079 NEW)
+target_link_libraries(DirectXMath INTERFACE NoSAL::NoSAL)
+cmake_policy(POP)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
 

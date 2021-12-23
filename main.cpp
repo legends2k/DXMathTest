@@ -1,20 +1,5 @@
 #include <iostream>
 
-// Note: Order matters.  Clang also defines __GNUG__!!
-#if defined(__clang__)
-#  define COMPILER_CLANG
-#elif defined(__GNUG__)
-#  define COMPILER_GCC
-#elif defined(_MSC_VER)
-#  define COMPILER_MSVC
-#endif
-
-// avoid sal.h symbols conflicting with GCC’s libstdc++ headers
-#ifdef COMPILER_GCC
-#  include <algorithm>
-#  include <utility>
-#endif
-
 #include <DirectXMath.h>
 // all DirectX Math symbols start with ‘XM’ prefix
 using namespace DirectX;

@@ -3,11 +3,10 @@
 [DirectX Math][] is an open-source 3D math library usable outside Windows and Direct3D.  This project uses CMake to build a toy program using DirectX Math.  It tackles the following using CMake:
 
 * Fetch DirectX Math
-* Fetch `sal.h` on non-Windows machines; a dependency of DirectX Math
-* Make an interface library out of `sal.h`
-* Add `sal` as a dependency on `DirectX Math`
+* Fetch [NoSAL][] for `sal.h`; a dependency of DirectX Math
+* Add NoSAL as a dependency on `DirectX Math`
 
-Additionally, in the source, it includes some headers _before_ including `DirectXMath.h` to avoid `sal.h`’s symbols from conflicting with GCC’s standard library headers.  This was done as called out in DirectX Math's documentation but no such conflicts were actually found.
+Opted out of using the [original `sal.h`][sal] since it conflicts with other projects like [stb][] when compiling with GCC and Clang.
 
 Tested on
 
@@ -29,4 +28,7 @@ cmake --build build -t run
 Additionally `-G` can be used to choose the generator in the generate step e.g. `cmake -B build -G Ninja`.
 
 [DirectX Math]: https://github.com/Microsoft/DirectXMath
+[NoSAL]: https://github.com/legends2k/NoSAL
+[sal]: https://github.com/dotnet/corert/blob/master/src/Native/inc/unix/sal.h
+[stb]: https://github.com/nothings/stb/
 [MSYS2]: https://www.msys2.org/
