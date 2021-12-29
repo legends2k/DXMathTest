@@ -21,7 +21,7 @@ include(FetchContent)
 FetchContent_Declare(
   DirectXMath
   GIT_REPOSITORY https://github.com/Microsoft/DirectXMath
-  GIT_TAG        0ca5e0b89ac740eea850760f54211a8609df7265
+  GIT_TAG        main
   GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(DirectXMath)
@@ -32,7 +32,7 @@ target_compile_definitions(DirectXMath INTERFACE
 FetchContent_Declare(
   NoSAL
   GIT_REPOSITORY https://github.com/legends2k/NoSAL
-  GIT_TAG        04fcde93e7c76e1a456a890a43328529a65297e8
+  GIT_TAG        main
   GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(NoSAL)
