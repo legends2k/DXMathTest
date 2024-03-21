@@ -30,6 +30,8 @@ target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
+target_compile_options(${PROJECT_NAME} PRIVATE
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall -Wextra>)
 
 # Look for sal.h; download if missing.  This skips download on Windows (both
 # with MSVC and MinGW which ships a sal.h).
