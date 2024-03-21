@@ -29,20 +29,20 @@ FetchContent_MakeAvailable(DirectXMath)
 target_compile_definitions(DirectXMath INTERFACE
   _XM_NO_XMVECTOR_OVERLOADS_)
 
-FetchContent_Declare(
-  NoSAL
-  GIT_REPOSITORY https://github.com/legends2k/NoSAL
-  GIT_TAG        main
-  GIT_SHALLOW    TRUE
-)
-FetchContent_MakeAvailable(NoSAL)
-cmake_policy(PUSH)
-# Allow calling target_link_libraries on targets not authored here
-cmake_policy(SET CMP0079 NEW)
-target_link_libraries(DirectXMath INTERFACE NoSAL::NoSAL)
-cmake_policy(POP)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMath)
+
+# Look for sal.h; download if missing.  This skips download on Windows (both
+# with MSVC and MinGW which ships a sal.h).
+find_file(SAL-HEADER sal.h)
+if(${SAL-HEADER} STREQUAL "SAL-HEADER-NOTFOUND")
+  # Refer target-not-Windows section of
+  # https://github.com/microsoft/vcpkg/blob/master/ports/directxmath/portfile.cmake
+  file(DOWNLOAD
+    "https://raw.githubusercontent.com/dotnet/runtime/v8.0.1/src/coreclr/pal/inc/rt/sal.h"
+    "${DirectXMath_SOURCE_DIR}/Inc/sal.h"
+    EXPECTED_HASH SHA512=0f5a80b97564217db2ba3e4624cc9eb308e19cc9911dae21d983c4ab37003f4756473297ba81b386c498514cedc1ef5a3553d7002edc09aeb6a1335df973095f
+  )
+endif()
 
 # convenience target for quick build and run
 add_custom_target(run
