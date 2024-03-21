@@ -35,8 +35,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 # Look for sal.h; download if missing.  This skips download on Windows (both
 # with MSVC and MinGW which ships a sal.h).
-find_file(SAL-HEADER sal.h)
-if(${SAL-HEADER} STREQUAL "SAL-HEADER-NOTFOUND")
+# https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Write-Platform-Checks
+include(CheckIncludeFiles)
+check_include_files(sal.h HAVE_SAL_H)
+if(NOT HAVE_SAL_H)
+  message(STATUS "Downloading sal.h...")
   # Refer target-not-Windows section of
   # https://github.com/microsoft/vcpkg/blob/master/ports/directxmath/portfile.cmake
   file(DOWNLOAD
